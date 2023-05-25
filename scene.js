@@ -52,18 +52,33 @@ const can5 = {
 	rz: 100,
 }
 
-// coords spread out in a circle:
-const center = { x: 0, z: 0 };
-const radius = 5;
-const angleIncrement = (2 * Math.PI) / 5;
+const canRotations = [
+	can1,
+	can2,
+	can3,
+	can4,
+	can5,
+]
 
-const coordinates = [];
+const amountOfCans = 5;
+// spawn all amount of cans, thus far it was manual
 
-for (let i = 0; i < 5; i++) {
-	const angle = angleIncrement * i;
-	const x = center.x + radius * Math.cos(angle);
-	const z = center.z + radius * Math.sin(angle);
-	coordinates.push({ x, y: 0, z });
+// function to return a list of all positions given the amount of cans
+function getCanPositions(amountOfCans) {
+	// coords spread out in a circle: to position all amount of cans right
+	const center = { x: 0, z: 0 };
+	const radius = 5;
+	const angleIncrement = (2 * Math.PI) / amountOfCans;
+	
+	const coordinates = [];
+	
+	for (let i = 0; i < amountOfCans; i++) {
+		const angle = angleIncrement * i;
+		const x = center.x + radius * Math.cos(angle);
+		const z = center.z + radius * Math.sin(angle);
+		coordinates.push({ x, y: 0, z });
+	}
+	return coordinates;
 }
 
 //shaders
@@ -116,191 +131,53 @@ scene.add(camera);
 
 //GLTF-Loader for Can
 const loader = new GLTFLoader();
-loader.load('Assets/Can.gltf', function (glb) {
-	console.log(glb);
-	const root = glb.scene;
-	root.scale.set(0.008, 0.008, 0.008);
-	root.position.x = coordinates[0].x;
-	root.position.y = coordinates[0].y;
-	root.position.z = coordinates[0].z;
-	root.rotation.x = can1.rx;
-	root.rotation.x = can1.rz;
-	root.rotation.x = can1.ry;
+var cans = loadCans(loader, amountOfCans);
+console.log(cans);
 
-	//metallic effect on can
-	const generator = new THREE.PMREMGenerator(renderer);
-	const envMap = generator.fromScene(scene, 0, 0.1, 100);
-	envMap.mapping = THREE.CubeRefractionMapping;;
-	envMap.texture.encoding = THREE.sRGBEEncoding;
-	root.material = new THREE.MeshPhysicalMaterial({
-		envMap: envMap.texture,
-		envMapIntensity: 1.0,
-		roughness: 0.1,
-		clearcoat: 1.0,
-		clearcoatRoughness: 0.0,
-		metalness: 1.0,
+// loads the cans using the supplied loader and returns them in a list
+function loadCans(loader, amountOfCans) {
+	var cans = [];
+	loader.load('Assets/Can.gltf', function (glb) {
+		const can = glb.scene;
+		can.scale.set(0.008, 0.008, 0.008);
+
+		// //metallic effect on can
+		// const generator = new THREE.PMREMGenerator(renderer);
+		// const envMap = generator.fromScene(scene, 0, 0.1, 100);
+		// envMap.mapping = THREE.CubeRefractionMapping;;
+		// envMap.texture.encoding = THREE.sRGBEEncoding;
+		// can.material = new THREE.MeshPhysicalMaterial({
+		// 	envMap: envMap.texture,
+		// 	envMapIntensity: 1.0,
+		// 	roughness: 0.1,
+		// 	clearcoat: 1.0,
+		// 	clearcoatRoughness: 0.0,
+		// 	metalness: 1.0,
+		// });
+
+		var canPositions = getCanPositions(amountOfCans);
+		// clone the cans and put them into the array to be returned later
+		for (var i = 0; i < amountOfCans; i++) {
+			var thisCan = can;
+			if (i != 0){
+				thisCan = can.clone();
+			}
+			thisCan.position.set(canPositions[i].x, canPositions[i].y, canPositions[i].z);
+			thisCan.rotation.set(canRotations[i % 6].rx, canRotations[i % 6].ry, canRotations[i % 6].rz);
+			scene.add(thisCan);
+			cans.push(thisCan);
+		}
+		animateCans(cans);
+		}, function (xhr) {
+		console.log((xhr.loaded / xhr.total * 100) + "% loaded")
+	}, function (error) {
+		console.log("An error occured")
 	});
-
-	scene.add(root);
-	initCan(root);
-	animateCans();
-
-	model = root;
-
-}, function (xhr) {
-	console.log((xhr.loaded / xhr.total * 100) + "% loaded")
-}, function (error) {
-	console.log("An error occured")
-});
+	return cans;
+}
 
 
-loader.load('Assets/Can.gltf', function (glb) {
-	console.log(glb);
-	const root = glb.scene;
-	root.scale.set(0.008, 0.008, 0.008);
-	root.position.x = coordinates[1].x;
-	root.position.y = coordinates[1].y;
-	root.position.z = coordinates[1].z;
-	root.rotation.x = can2.rx;
-	root.rotation.x = can2.rz;
-	root.rotation.x = can2.ry;
 
-	//metallic effect on can
-	const generator = new THREE.PMREMGenerator(renderer);
-	const envMap = generator.fromScene(scene, 0, 0.1, 100);
-	envMap.mapping = THREE.CubeRefractionMapping;;
-	envMap.texture.encoding = THREE.sRGBEEncoding;
-	root.material = new THREE.MeshPhysicalMaterial({
-		envMap: envMap.texture,
-		envMapIntensity: 1.0,
-		roughness: 0.1,
-		clearcoat: 1.0,
-		clearcoatRoughness: 0.0,
-		metalness: 1.0,
-	});
-
-	scene.add(root);
-	initCan(root);
-	animateCans();
-
-	model = root;
-
-}, function (xhr) {
-	console.log((xhr.loaded / xhr.total * 100) + "% loaded")
-}, function (error) {
-	console.log("An error occured")
-});
-
-loader.load('Assets/Can.gltf', function (glb) {
-	console.log(glb);
-	const root = glb.scene;
-	root.scale.set(0.008, 0.008, 0.008);
-	root.position.x = coordinates[2].x;
-	root.position.y = coordinates[2].y;
-	root.position.z = coordinates[2].z;
-	root.rotation.x = can3.rx;
-	root.rotation.x = can3.rz;
-	root.rotation.x = can3.ry;
-
-	//metallic effect on can
-	const generator = new THREE.PMREMGenerator(renderer);
-	const envMap = generator.fromScene(scene, 0, 0.1, 100);
-	envMap.mapping = THREE.CubeRefractionMapping;;
-	envMap.texture.encoding = THREE.sRGBEEncoding;
-	root.material = new THREE.MeshPhysicalMaterial({
-		envMap: envMap.texture,
-		envMapIntensity: 1.0,
-		roughness: 0.1,
-		clearcoat: 1.0,
-		clearcoatRoughness: 0.0,
-		metalness: 1.0,
-	});
-
-	scene.add(root);
-	initCan(root);
-	animateCans();
-
-	model = root;
-
-}, function (xhr) {
-	console.log((xhr.loaded / xhr.total * 100) + "% loaded")
-}, function (error) {
-	console.log("An error occured")
-});
-
-loader.load('Assets/Can.gltf', function (glb) {
-	console.log(glb);
-	const root = glb.scene;
-	root.scale.set(0.008, 0.008, 0.008);
-	root.position.x = coordinates[3].x;
-	root.position.y = coordinates[3].y;
-	root.position.z = coordinates[3].z;
-	root.rotation.x = can4.rx;
-	root.rotation.x = can4.rz;
-	root.rotation.x = can4.ry;
-
-	//metallic effect on can
-	const generator = new THREE.PMREMGenerator(renderer);
-	const envMap = generator.fromScene(scene, 0, 0.1, 100);
-	envMap.mapping = THREE.CubeRefractionMapping;;
-	envMap.texture.encoding = THREE.sRGBEEncoding;
-	root.material = new THREE.MeshPhysicalMaterial({
-		envMap: envMap.texture,
-		envMapIntensity: 1.0,
-		roughness: 0.1,
-		clearcoat: 1.0,
-		clearcoatRoughness: 0.0,
-		metalness: 1.0,
-	});
-
-	scene.add(root);
-	initCan(root);
-	animateCans();
-
-	model = root;
-
-}, function (xhr) {
-	console.log((xhr.loaded / xhr.total * 100) + "% loaded")
-}, function (error) {
-	console.log("An error occured")
-});
-
-loader.load('Assets/Can.gltf', function (glb) {
-	console.log(glb);
-	const root = glb.scene;
-	root.scale.set(0.008, 0.008, 0.008);
-	root.position.x = coordinates[4].x;
-	root.position.y = coordinates[4].y;
-	root.position.z = coordinates[4].z;
-	root.rotation.x = can5.rx;
-	root.rotation.x = can5.rz;
-	root.rotation.x = can5.ry;
-
-	//metallic effect on can
-	const generator = new THREE.PMREMGenerator(renderer);
-	const envMap = generator.fromScene(scene, 0, 0.1, 100);
-	envMap.mapping = THREE.CubeRefractionMapping;;
-	envMap.texture.encoding = THREE.sRGBEEncoding;
-	root.material = new THREE.MeshPhysicalMaterial({
-		envMap: envMap.texture,
-		envMapIntensity: 1.0,
-		roughness: 0.1,
-		clearcoat: 1.0,
-		clearcoatRoughness: 0.0,
-		metalness: 1.0,
-	});
-
-	scene.add(root);
-	initCan(root);
-	animateCans();
-
-	model = root;
-
-}, function (xhr) {
-	console.log((xhr.loaded / xhr.total * 100) + "% loaded")
-}, function (error) {
-	console.log("An error occured")
-});
 
 //Sphere
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -352,11 +229,6 @@ function animate() {
 	controls.update();
 	renderer.render(scene, camera);
 };
-
-let cans = [];
-function initCan(root) {
-	cans.push(root);
-}
 
 function animateCans() {
 	let canCounter = 0;
