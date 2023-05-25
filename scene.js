@@ -9,7 +9,8 @@ import { ARButton } from './ARButton.js';
 let time = 0;
 
 //constant Variables
-const container = document.getElementById('container');
+const startContainer = document.getElementById('start-div');
+const container = document.getElementById('3d-container');
 
 const sizes = {
 	width: window.innerWidth,
@@ -104,7 +105,8 @@ container.appendChild(renderer.domElement);
 
 //AR-Button
 const button = ARButton.createButton(renderer);
-document.body.appendChild(button);
+button.id = "ar-btn";
+startContainer.appendChild(button);
 
 //HDRI for Scene
 // new RGBELoader()

@@ -9,3 +9,11 @@ canvas {
     height: 100vh;
     background-color: brown;
 }
+
+.hidden {
+    display: none;
+}
+
+#ar-btn {
+    border: 1px solid #000;
+}
