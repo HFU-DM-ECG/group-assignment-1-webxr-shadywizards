@@ -61,7 +61,7 @@ const canRotations = [
 	can5,
 ]
 
-const amountOfCans = 5;
+const amountOfCans = 12;
 // spawn all amount of cans, thus far it was manual
 
 // function to return a list of all positions given the amount of cans
@@ -70,9 +70,9 @@ function getCanPositions(amountOfCans) {
 	const center = { x: 0, z: 0 };
 	const radius = 5;
 	const angleIncrement = (2 * Math.PI) / amountOfCans;
-	
+
 	const coordinates = [];
-	
+
 	for (let i = 0; i < amountOfCans; i++) {
 		const angle = angleIncrement * i;
 		const x = center.x + radius * Math.cos(angle);
@@ -106,6 +106,9 @@ container.appendChild(renderer.domElement);
 //AR-Button
 const button = ARButton.createButton(renderer);
 button.id = "ar-btn";
+button.addEventListener("click", () => {
+	container.className = "";
+});
 startContainer.appendChild(button);
 
 //HDRI for Scene
@@ -161,16 +164,16 @@ function loadCans(loader, amountOfCans) {
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
-			if (i != 0){
+			if (i != 0) {
 				thisCan = can.clone();
 			}
 			thisCan.position.set(canPositions[i].x, canPositions[i].y, canPositions[i].z);
-			thisCan.rotation.set(canRotations[i % 6].rx, canRotations[i % 6].ry, canRotations[i % 6].rz);
+			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
 			scene.add(thisCan);
 			cans.push(thisCan);
 		}
 		animateCans(cans);
-		}, function (xhr) {
+	}, function (xhr) {
 		console.log((xhr.loaded / xhr.total * 100) + "% loaded")
 	}, function (error) {
 		console.log("An error occured")
