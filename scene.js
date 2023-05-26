@@ -9,8 +9,8 @@ import { ARButton } from './ARButton.js';
 let time = 0;
 
 //constant Variables
-const startContainer = document.getElementById('start-div');
-const container = document.getElementById('3d-container');
+const startContainer = document.getElementById('start-container');
+const sceneContainer = document.getElementById('scene-container');
 
 const sizes = {
 	width: window.innerWidth,
@@ -100,16 +100,18 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
-container.appendChild(renderer.domElement);
+sceneContainer.appendChild(renderer.domElement);
 
 
 //AR-Button
-const button = ARButton.createButton(renderer);
-button.id = "ar-btn";
-button.addEventListener("click", () => {
-	container.className = "";
+const arButton = ARButton.createButton(renderer);
+arButton.id = "ar-btn";
+arButton.addEventListener("click", () => {
+	//container by default has class "hidden", which has the attribute "display: none"
+	//-> hide container which holds the scene until AR is started
+	sceneContainer.className = "";
 });
-startContainer.appendChild(button);
+startContainer.appendChild(arButton);
 
 //HDRI for Scene
 // new RGBELoader()
