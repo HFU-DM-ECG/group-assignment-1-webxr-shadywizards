@@ -189,11 +189,11 @@ function loadCans(loader, amountOfCans) {
 //Sphere
 const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
 const sphereMaterial = new THREE.ShaderMaterial({
-	vertexShader: sunVertexShader,
-	fragmentShader: sunFragmentShader,
-	uniforms: {
-		time: { value: 0 }
-	}
+	// vertexShader: sunVertexShader,
+	// fragmentShader: sunFragmentShader,
+	// uniforms: {
+	// 	time: { value: 0 }
+	// }
 });
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphere.position.x = sun.x;
@@ -229,7 +229,7 @@ controls.update()
 //Szene rendern lassen
 function animate() {
 	time += 1;
-	sphereMaterial.uniforms.time.value = time;
+	// sphereMaterial.uniforms.time.value = time;
 	glowMaterial.uniforms.time.value = time;
 	scene;
 	requestAnimationFrame(animate);
