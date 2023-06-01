@@ -60,7 +60,7 @@ const canRotations = [
 	can5,
 ]
 
-const amountOfCans = 12;
+const amountOfCans = 9;
 // spawn all amount of cans, thus far it was manual
 
 // function to return a list of all positions given the amount of cans
@@ -122,6 +122,18 @@ scene.add(ambientLight);
 camera.position.set(3.5, 0.5, 5);
 scene.add(camera);
 
+//load banners for the cans
+var canBanners = [];
+//load the bannernames into an array, so their loading process can be started within one for-loop
+var bannerNames = ["Merkury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+for (let i = 0; i < (amountOfCans); i++) {
+	loadBanners('Assets/Planetbanners/' + bannerNames[i] + '.png');
+}
+function loadBanners(src) {
+	const texture = new THREE.TextureLoader().load(src);
+	const material = new THREE.MeshBasicMaterial({ map: texture });
+	canBanners.push(material);
+}
 
 //GLTF-Loader for Can
 const loader = new GLTFLoader();
@@ -158,6 +170,8 @@ function loadCans(loader, amountOfCans) {
 			}
 			thisCan.position.set(canPositions[i].x, canPositions[i].y, canPositions[i].z);
 			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
+			//add banner to can
+			thisCan.getObjectByName("Cylinder.002_0").material = canBanners[i];
 			scene.add(thisCan);
 			cans.push(thisCan);
 		}
