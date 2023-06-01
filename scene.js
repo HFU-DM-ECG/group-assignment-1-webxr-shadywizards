@@ -1,7 +1,5 @@
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
 import * as THREE from 'https://unpkg.com/three@0.120.1/build/three.module.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/GLTFLoader.js';
-import { RGBELoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/RGBELoader.js';
 import { ARButton } from './ARButton.js';
 
 
@@ -113,18 +111,6 @@ arButton.addEventListener("click", () => {
 });
 startContainer.appendChild(arButton);
 
-//HDRI for Scene
-// new RGBELoader()
-// 	.load("Assets/galaxy.hdr", function (texture) {
-// 		texture.mapping = THREE.EquirectangularReflectionMapping;
-// 		scene.background = texture;
-// 		//scene.environment = texture;
-// 	});
-// new RGBELoader().load("Assets/can.hdr", function (texture) {
-// 	texture.mapping = THREE.EquirectangularReflectionMapping;
-// 	scene.environment = texture;
-// });
-
 
 //Temporary Light
 const light = new THREE.AmbientLight(0xffffff, 2);
@@ -217,14 +203,6 @@ glowSphere.position.y = sun.z;
 glowSphere.position.z = sun.y;
 // scene.add(glowSphere);
 
-//Orbitcontrols
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.autoRotate = true;
-controls.enablePan = false;
-controls.minDistance = 2;
-controls.maxDistance = 15;
-controls.maxPolarAngle = Math.PI;
-controls.update()
 
 //Szene rendern lassen
 function animate() {
@@ -233,7 +211,6 @@ function animate() {
 	glowMaterial.uniforms.time.value = time;
 	scene;
 	requestAnimationFrame(animate);
-	controls.update();
 	renderer.render(scene, camera);
 };
 
