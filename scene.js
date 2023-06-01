@@ -84,8 +84,8 @@ function getCanPositions(amountOfCans) {
 
 //shaders
 //sun
-const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
-const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
+// const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
+// const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
 const glowVertexShader = await fetch('./shaders/glow_shader.vert').then(response => response.text());
 const glowFragmentShader = await fetch('./shaders/glow_shader.frag').then(response => response.text());
 
