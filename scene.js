@@ -1,3 +1,4 @@
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
 import * as THREE from 'https://unpkg.com/three@0.120.1/build/three.module.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/GLTFLoader.js';
 import { ARButton } from './ARButton.js';
@@ -15,7 +16,7 @@ const sizes = {
 	height: window.innerHeight
 }
 
-const sun = {
+const sunPos = {
 	x: 0,
 	y: 0,
 	z: 0
@@ -84,17 +85,14 @@ function getCanPositions(amountOfCans) {
 //sun
 // const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
 // const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
-const glowVertexShader = await fetch('./shaders/glow_shader.vert').then(response => response.text());
-const glowFragmentShader = await fetch('./shaders/glow_shader.frag').then(response => response.text());
+// const glowVertexShader = await fetch('./shaders/glow_shader.vert').then(response => response.text());
+// const glowFragmentShader = await fetch('./shaders/glow_shader.frag').then(response => response.text());
 
 //Basiskomponenten erzeugen
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 25);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-// renderer.toneMapping = THREE.ACESFilmicToneMapping;
-// renderer.toneMappingExposure = 0.6;
-// renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
@@ -112,10 +110,13 @@ arButton.addEventListener("click", () => {
 startContainer.appendChild(arButton);
 
 
-//Temporary Light
-const light = new THREE.AmbientLight(0xffffff, 2);
-light.position.set(2, 2, 5);
-scene.add(light);
+//Lights
+const sunLight = new THREE.PointLight(0xffffff, 2.5);
+sunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
+scene.add(sunLight);
+const ambientLight = new THREE.AmbientLight(0xffffff, .2);
+ambientLight.position.set(sunPos.x, sunPos.y, sunPos.z);
+scene.add(ambientLight);
 
 //Kamera-Settings
 camera.position.set(3.5, 0.5, 5);
@@ -172,44 +173,65 @@ function loadCans(loader, amountOfCans) {
 
 
 
-//Sphere
-const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-const sphereMaterial = new THREE.ShaderMaterial({
-	// vertexShader: sunVertexShader,
-	// fragmentShader: sunFragmentShader,
-	// uniforms: {
-	// 	time: { value: 0 }
-	// }
-});
-const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-sphere.position.x = sun.x;
-sphere.position.y = sun.z;
-sphere.position.z = sun.y;
-scene.add(sphere);
+//Sun----------------------------------------------------------------
+const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
+// const sphereMaterial = new THREE.ShaderMaterial({
+// 	vertexShader: sunVertexShader,
+// 	fragmentShader: sunFragmentShader,
+// 	uniforms: {
+// 		time: { value: 0 }
+// 	}
+// });
+//sun texutre
+const threeTone = new THREE.TextureLoader().load('Assets/sun.jpg');
+threeTone.minFilter = THREE.NearestFilter;
+threeTone.magFilter = THREE.NearestFilter;
+
+//toon shader
+const toonMaterial = new THREE.MeshToonMaterial();
+toonMaterial.map = threeTone;
+toonMaterial.color = new THREE.Color(0xfcba03);
+
+const sunMesh = new THREE.Mesh(sunGeometry, toonMaterial);
+sunMesh.position.x = sunPos.x;
+sunMesh.position.y = sunPos.z;
+sunMesh.position.z = sunPos.y;
+scene.add(sunMesh);
+//-------------------------------------------------------------------
 
 //Sphere-glow
-const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
-const glowMaterial = new THREE.ShaderMaterial({
-	vertexShader: glowVertexShader,
-	fragmentShader: glowFragmentShader,
-	side: THREE.BackSide,
-	uniforms: {
-		time: { value: 0 }
-	}
-});
-const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
-glowSphere.position.x = sun.x;
-glowSphere.position.y = sun.z;
-glowSphere.position.z = sun.y;
-// scene.add(glowSphere);
+// const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+// const glowMaterial = new THREE.ShaderMaterial({
+// 	vertexShader: glowVertexShader,
+// 	fragmentShader: glowFragmentShader,
+// 	side: THREE.BackSide,
+// 	uniforms: {
+// 		time: { value: 0 }
+// 	}
+// });
+// const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
+// glowSphere.position.x = sun.x;
+// glowSphere.position.y = sun.z;
+// glowSphere.position.z = sun.y;
+// // scene.add(glowSphere);
+
+//controls (for now)
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.autoRotate = true;
+controls.enablePan = false;
+controls.minDistance = 2;
+controls.maxDistance = 15;
+controls.maxPolarAngle = Math.PI;
+controls.update()
 
 
 //Szene rendern lassen
 function animate() {
 	time += 1;
 	// sphereMaterial.uniforms.time.value = time;
-	glowMaterial.uniforms.time.value = time;
+	// glowMaterial.uniforms.time.value = time;
 	scene;
+	controls.update();
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 };
