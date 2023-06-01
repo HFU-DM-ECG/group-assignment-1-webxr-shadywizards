@@ -120,10 +120,10 @@ startContainer.appendChild(arButton);
 // 		scene.background = texture;
 // 		//scene.environment = texture;
 // 	});
-new RGBELoader().load("Assets/can.hdr", function (texture) {
-	texture.mapping = THREE.EquirectangularReflectionMapping;
-	scene.environment = texture;
-});
+// new RGBELoader().load("Assets/can.hdr", function (texture) {
+// 	texture.mapping = THREE.EquirectangularReflectionMapping;
+// 	scene.environment = texture;
+// });
 
 
 //Temporary Light
@@ -144,7 +144,7 @@ console.log(cans);
 // loads the cans using the supplied loader and returns them in a list
 function loadCans(loader, amountOfCans) {
 	var cans = [];
-	loader.load('Assets/Can.gltf', function (glb) {
+	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
 		can.scale.set(0.008, 0.008, 0.008);
 
