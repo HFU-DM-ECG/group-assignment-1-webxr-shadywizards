@@ -131,6 +131,7 @@ for (let i = 0; i < (amountOfCans); i++) {
 }
 function loadBanners(src) {
 	const texture = new THREE.TextureLoader().load(src);
+	texture.flipY = false;
 	const material = new THREE.MeshBasicMaterial({ map: texture });
 	canBanners.push(material);
 }
