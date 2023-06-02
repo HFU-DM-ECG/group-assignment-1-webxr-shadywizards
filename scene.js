@@ -96,11 +96,14 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
-// sceneContainer.appendChild(renderer.domElement);
+sceneContainer.appendChild(renderer.domElement);
 
 
 //AR-Button
-const arButton = ARButton.createButton(renderer);
+const arButton = ARButton.createButton(renderer, {
+	optionalFeatures: ["dom-overlay", "dom-overlay-for-handheld-ar"],
+	domOverlay: { root: document.body },
+});
 arButton.id = "ar-btn";
 arButton.addEventListener("click", () => {
 	//container by default has class "hidden", which has the attribute "display: none"
@@ -110,11 +113,27 @@ arButton.addEventListener("click", () => {
 startContainer.appendChild(arButton);
 
 
+//AR controller 
+let objectPlaced = false;
+function onSelect() {
+	if (objectPlaced) return;
+
+	sunMesh.position.set(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
+	console.log("selected");
+
+	objectPlaced = true;
+}
+
+const controller = renderer.xr.getController(0);
+controller.addEventListener("select", onSelect);
+scene.add(controller);
+
+
 //Lights
 const sunLight = new THREE.PointLight(0xffffff, 2.5);
 sunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(sunLight);
-const ambientLight = new THREE.AmbientLight(0xffffff, .2);
+const ambientLight = new THREE.AmbientLight(0xffffff, .001);
 ambientLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(ambientLight);
 
