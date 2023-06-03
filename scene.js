@@ -101,6 +101,7 @@ sceneContainer.appendChild(renderer.domElement);
 
 //AR-Button
 const arButton = ARButton.createButton(renderer, {
+	requiredFeatures: ['hit-test'],
 	optionalFeatures: ["dom-overlay", "dom-overlay-for-handheld-ar"],
 	domOverlay: { root: document.body },
 });
@@ -267,6 +268,7 @@ function animate() {
 	scene;
 	controls.update();
 	requestAnimationFrame(animate);
+	renderer.setAnimationLoop(render.bind(this));
 	renderer.render(scene, camera);
 };
 
