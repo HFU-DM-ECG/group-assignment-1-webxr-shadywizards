@@ -4,6 +4,12 @@ body {
     padding: 0;
 }
 
+canvas {
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+}
+
 .hidden {
     display: none;
 }
@@ -22,10 +28,10 @@ body {
     transition: all 0.3s;
 }
 
-#startIMG{
-	width: 100vw; 
-	height: 100vh; 
-	object-fit: cover;
-	object-position: 50%;
+#startIMG {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    object-position: 50%;
     z-index: 2;
 }

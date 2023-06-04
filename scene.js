@@ -83,21 +83,21 @@ function getCanPositions(amountOfCans) {
 
 //shaders
 //sun
-// const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
-// const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
-// const glowVertexShader = await fetch('./shaders/glow_shader.vert').then(response => response.text());
-// const glowFragmentShader = await fetch('./shaders/glow_shader.frag').then(response => response.text());
+const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
+const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
+
 
 //Basiskomponenten erzeugen
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 25);
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer(
+	{ antialias: true, alpha: true, canvas: sceneContainer }
+);
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
-sceneContainer.appendChild(renderer.domElement);
-
+// sceneContainer.appendChild(renderer.domElement);
 
 //AR-Button
 const arButton = ARButton.createButton(renderer, {
@@ -131,10 +131,10 @@ scene.add(controller);
 
 
 //Lights
-const sunLight = new THREE.PointLight(0xffffff, 2.5);
+const sunLight = new THREE.PointLight(0xffffff, 1.5);
 sunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(sunLight);
-const ambientLight = new THREE.AmbientLight(0xffffff, .001);
+const ambientLight = new THREE.AmbientLight(0xffffff, .2);
 ambientLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(ambientLight);
 
@@ -152,7 +152,7 @@ for (let i = 0; i < (amountOfCans); i++) {
 function loadBanners(src) {
 	const texture = new THREE.TextureLoader().load(src);
 	texture.flipY = false;
-	const material = new THREE.MeshBasicMaterial({ map: texture });
+	const material = new THREE.MeshPhysicalMaterial({ map: texture });
 	canBanners.push(material);
 }
 
@@ -210,13 +210,13 @@ function loadCans(loader, amountOfCans) {
 
 //Sun----------------------------------------------------------------
 const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
-// const sphereMaterial = new THREE.ShaderMaterial({
-// 	vertexShader: sunVertexShader,
-// 	fragmentShader: sunFragmentShader,
-// 	uniforms: {
-// 		time: { value: 0 }
-// 	}
-// });
+const sunMaterial = new THREE.ShaderMaterial({
+	vertexShader: sunVertexShader,
+	fragmentShader: sunFragmentShader,
+	uniforms: {
+		time: { value: 0 }
+	}
+});
 //sun texutre
 const threeTone = new THREE.TextureLoader().load('Assets/sun.jpg');
 threeTone.minFilter = THREE.NearestFilter;
@@ -227,28 +227,12 @@ const toonMaterial = new THREE.MeshToonMaterial();
 toonMaterial.map = threeTone;
 toonMaterial.color = new THREE.Color(0xfcba03);
 
-const sunMesh = new THREE.Mesh(sunGeometry, toonMaterial);
+const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.x = sunPos.x;
 sunMesh.position.y = sunPos.z;
 sunMesh.position.z = sunPos.y;
 scene.add(sunMesh);
 //-------------------------------------------------------------------
-
-//Sphere-glow
-// const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
-// const glowMaterial = new THREE.ShaderMaterial({
-// 	vertexShader: glowVertexShader,
-// 	fragmentShader: glowFragmentShader,
-// 	side: THREE.BackSide,
-// 	uniforms: {
-// 		time: { value: 0 }
-// 	}
-// });
-// const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
-// glowSphere.position.x = sun.x;
-// glowSphere.position.y = sun.z;
-// glowSphere.position.z = sun.y;
-// // scene.add(glowSphere);
 
 //controls (for now)
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -263,12 +247,10 @@ controls.update()
 //Szene rendern lassen
 function animate() {
 	time += 1;
-	// sphereMaterial.uniforms.time.value = time;
-	// glowMaterial.uniforms.time.value = time;
+	sunMaterial.uniforms.time.value = time;
 	scene;
 	controls.update();
 	requestAnimationFrame(animate);
-	renderer.setAnimationLoop(render.bind(this));
 	renderer.render(scene, camera);
 };
 
