@@ -3,6 +3,7 @@ import * as THREE from 'https://unpkg.com/three@0.120.1/build/three.module.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.120.1/examples/jsm/loaders/GLTFLoader.js';
 import { ARButton } from './ARButton.js';
 
+import * as planets from './planets.js';
 
 //changing variables
 let time = 0;
@@ -60,27 +61,6 @@ const canRotations = [
 	can5,
 ]
 
-const amountOfCans = 9;
-// spawn all amount of cans, thus far it was manual
-
-// function to return a list of all positions given the amount of cans
-function getCanPositions(amountOfCans) {
-	// coords spread out in a circle: to position all amount of cans right
-	const center = { x: 0, z: 0 };
-	const radius = 5;
-	const angleIncrement = (2 * Math.PI) / amountOfCans;
-
-	const coordinates = [];
-
-	for (let i = 0; i < amountOfCans; i++) {
-		const angle = angleIncrement * i;
-		const x = center.x + radius * Math.cos(angle);
-		const z = center.z + radius * Math.sin(angle);
-		coordinates.push({ x, y: 0, z });
-	}
-	return coordinates;
-}
-
 //shaders
 //sun
 const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
@@ -89,7 +69,7 @@ const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response
 
 //Basiskomponenten erzeugen
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 25);
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
 const renderer = new THREE.WebGLRenderer(
 	{ antialias: true, alpha: true, canvas: sceneContainer }
 );
@@ -146,7 +126,7 @@ scene.add(camera);
 var canBanners = [];
 //load the bannernames into an array, so their loading process can be started within one for-loop
 var bannerNames = ["Merkury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
-for (let i = 0; i < (amountOfCans); i++) {
+for (let i = 0; i < (planets.amount); i++) {
 	loadBanners('Assets/Planetbanners/' + bannerNames[i] + '.png');
 }
 function loadBanners(src) {
@@ -158,7 +138,7 @@ function loadBanners(src) {
 
 //GLTF-Loader for Can
 const loader = new GLTFLoader();
-var cans = loadCans(loader, amountOfCans);
+var cans = loadCans(loader, planets.amount);
 console.log(cans);
 
 // loads the cans using the supplied loader and returns them in a list
@@ -166,7 +146,7 @@ function loadCans(loader, amountOfCans) {
 	var cans = [];
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
-		can.scale.set(0.008, 0.008, 0.008);
+		can.scale.set(0.004, 0.004, 0.004);
 
 		// //metallic effect on can
 		// const generator = new THREE.PMREMGenerator(renderer);
@@ -182,7 +162,8 @@ function loadCans(loader, amountOfCans) {
 		// 	metalness: 1.0,
 		// });
 
-		var canPositions = getCanPositions(amountOfCans);
+		// var canPositions = getCanPositions(planets.amount);
+		var canPositions = planets.getAllPlanetPositions(0);
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
@@ -232,11 +213,15 @@ sunMesh.position.x = sunPos.x;
 sunMesh.position.y = sunPos.z;
 sunMesh.position.z = sunPos.y;
 scene.add(sunMesh);
+
+// const origo = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), toonMaterial);
+// origo.position.set(0, 0, 0);
+// scene.add(origo);
 //-------------------------------------------------------------------
 
 //controls (for now)
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.autoRotate = true;
+controls.autoRotate = false;
 controls.enablePan = false;
 controls.minDistance = 2;
 controls.maxDistance = 15;
@@ -257,19 +242,20 @@ function animate() {
 function animateCans() {
 	let canCounter = 0;
 	for (const can of cans) {
-		canCounter += 1;
-		const time = Date.now();
 		const offsetTime = time + 500;
-
+		
 		can.rotation.x = can.rotation.x + .0008;
 		can.rotation.y = can.rotation.y + .0009;
 		can.rotation.z = can.rotation.z + .0003;
-
+		
+		can.position.x = planets.getAllPlanetPositions(time/2000)[canCounter].x;
+		can.position.z = planets.getAllPlanetPositions(time/2000)[canCounter].z;
 		if (canCounter % 2 === 0) {
 			can.position.y = 0.5 + Math.sin(offsetTime * 0.001) * 0.5;
 		} else {
 			can.position.y = Math.sin(time * 0.001) * 0.3;
 		}
+		canCounter += 1;
 	}
 	requestAnimationFrame(animateCans);
 	renderer.render(scene, camera);
