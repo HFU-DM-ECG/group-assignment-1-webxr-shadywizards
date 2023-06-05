@@ -219,6 +219,7 @@ const sunMaterial = new THREE.ShaderMaterial({
 });
 
 //sun texutre
+//use the noise of perlinShader as a texture, in order to improve performance
 const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
 	256, {
 	format: THREE.RGBAFormat,
@@ -227,7 +228,7 @@ const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
 	encoding: THREE.sRGBEncoding
 });
 cubeRenderTarget1.texture.type = THREE.HalfFloatType;
-const cubeCamera1 = new THREE.CubeCamera(0.1, 1000, cubeRenderTarget1);
+const cubeCamera1 = new THREE.CubeCamera(0.1, 10, cubeRenderTarget1);
 const perlinMaterial = new THREE.ShaderMaterial({
 	side: THREE.DoubleSide,
 	vertexShader: perlinVertexShader,
