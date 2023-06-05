@@ -80,7 +80,6 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.xr.enabled = true;
-// sceneContainer.appendChild(renderer.domElement);
 
 //AR-Button
 const arButton = ARButton.createButton(renderer, {
@@ -89,25 +88,21 @@ const arButton = ARButton.createButton(renderer, {
 	domOverlay: { root: document.body },
 });
 arButton.id = "ar-btn";
-arButton.addEventListener("click", () => {
-	//container by default has class "hidden", which has the attribute "display: none"
-	//-> hide container which holds the scene until AR is started
-	sceneContainer.className = "";
-});
 startContainer.appendChild(arButton);
 
 
 //AR controller 
-let objectPlaced = false;
+let scenePlaced = false;
 function onSelect() {
-	if (objectPlaced) return;
+	if (scenePlaced) return;
 
-	sunMesh.position.set(0, 0, -0.5).applyMatrix4(controller.matrixWorld);
-	console.log("selected");
+	sceneContainer.className = "";
+	console.log('solar system placed');
 
-	objectPlaced = true;
+	scenePlaced = true;
 }
 
+//controller = first touch input onto the scene
 const controller = renderer.xr.getController(0);
 controller.addEventListener("select", onSelect);
 scene.add(controller);

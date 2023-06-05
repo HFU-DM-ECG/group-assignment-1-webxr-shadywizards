@@ -1,17 +1,17 @@
 /// Planet positioning tools
-const M = 1.989 * 10^30; // mass of the sun in kilograms
+const M = 1.989 * 10 ^ 30; // mass of the sun in kilograms
 const G = 9.81; // Gravitationskonstante in N / kg
 // dictionary for necessary planet data
 const Planets = {
-  "Mercury" : {semiMajorAxis : 0.3871, orbitalPeriodInYears : 0.2408},
-  "Venus" : {semiMajorAxis : 0.7233, orbitalPeriodInYears : 0.6152},
-  "Earth" : {semiMajorAxis : 1, orbitalPeriodInYears : 1},
-  "Mars" : {semiMajorAxis : 1.5273, orbitalPeriodInYears : 1.8809},
-  "Jupiter" : {semiMajorAxis : 5.2028, orbitalPeriodInYears : 11.862},
-  "Saturn" : {semiMajorAxis : 9.5388, orbitalPeriodInYears : 29.458},
-  "Uranus" : {semiMajorAxis : 19.1914, orbitalPeriodInYears : 84.01},
-  "Neptune" : {semiMajorAxis : 30.0611, orbitalPeriodInYears : 164.79},
-  "Pluto" : {semiMajorAxis : 39.5294, orbitalPeriodInYears : 248.54},
+  "Mercury": { semiMajorAxis: 0.3871, orbitalPeriodInYears: 0.2408 },
+  "Venus": { semiMajorAxis: 0.7233, orbitalPeriodInYears: 0.6152 },
+  "Earth": { semiMajorAxis: 1, orbitalPeriodInYears: 1 },
+  "Mars": { semiMajorAxis: 1.5273, orbitalPeriodInYears: 1.8809 },
+  "Jupiter": { semiMajorAxis: 5.2028, orbitalPeriodInYears: 11.862 },
+  "Saturn": { semiMajorAxis: 9.5388, orbitalPeriodInYears: 29.458 },
+  "Uranus": { semiMajorAxis: 19.1914, orbitalPeriodInYears: 84.01 },
+  "Neptune": { semiMajorAxis: 30.0611, orbitalPeriodInYears: 164.79 },
+  "Pluto": { semiMajorAxis: 39.5294, orbitalPeriodInYears: 248.54 },
 };
 // sMA definiert die Größe der Umlaufbahn
 // große Halbachsen jedes Planetens sind in AU gegeben. 
@@ -23,12 +23,12 @@ export const amount = Object.keys(Planets).length;
 
 // berechnung der Planetenpositionen auf Basis der kepler'schen Gesetze mithilfe der obigen Daten
 function calculatePlanetPosition(time, planet) { // 
-	const omega = (2 * Math.PI) / planet.orbitalPeriodInYears; // Winkelgeschwindigkeit -> Winkel, den planet pro zeiteinheit durchläuft
+  const omega = (2 * Math.PI) / planet.orbitalPeriodInYears; // Winkelgeschwindigkeit -> Winkel, den planet pro zeiteinheit durchläuft
   const scaleFactor = 5;
-	const x = planet.semiMajorAxis * Math.cos(omega * time) * scaleFactor;
-	const y = planet.semiMajorAxis * Math.sin(omega * time) * scaleFactor;
+  const x = planet.semiMajorAxis * Math.cos(omega * time) * scaleFactor;
+  const y = planet.semiMajorAxis * Math.sin(omega * time) * scaleFactor;
 
-	return {x, y};
+  return { x, y };
 }
 
 export function getAllPlanetPositions(time) {
@@ -38,7 +38,7 @@ export function getAllPlanetPositions(time) {
     var position = calculatePlanetPosition(time, Planets[key]);
     coordinates.push({ x: position.x, y: 0, z: position.y });
   }
-  console.log(coordinates[0].x);
+  // console.log(coordinates[0].x);
   return coordinates;
 }
 
