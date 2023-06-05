@@ -83,6 +83,8 @@ function getCanPositions(amountOfCans) {
 
 //shaders
 //sun
+const perlinVertexShader = await fetch('./shaders/old/sun_shader.vert').then(response => response.text());
+const perlinFragmentShader = await fetch('./shaders/old/sun_shader.frag').then(response => response.text());
 const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
 const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
 
@@ -96,6 +98,7 @@ const renderer = new THREE.WebGLRenderer(
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.xr.enabled = true;
 // sceneContainer.appendChild(renderer.domElement);
 
@@ -152,6 +155,7 @@ for (let i = 0; i < (amountOfCans); i++) {
 function loadBanners(src) {
 	const texture = new THREE.TextureLoader().load(src);
 	texture.flipY = false;
+	texture.encoding = THREE.sRGBEncoding;
 	const material = new THREE.MeshPhysicalMaterial({ map: texture });
 	canBanners.push(material);
 }
@@ -159,7 +163,6 @@ function loadBanners(src) {
 //GLTF-Loader for Can
 const loader = new GLTFLoader();
 var cans = loadCans(loader, amountOfCans);
-console.log(cans);
 
 // loads the cans using the supplied loader and returns them in a list
 function loadCans(loader, amountOfCans) {
@@ -211,21 +214,48 @@ function loadCans(loader, amountOfCans) {
 //Sun----------------------------------------------------------------
 const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
 const sunMaterial = new THREE.ShaderMaterial({
+	side: THREE.DoubleSide,
 	vertexShader: sunVertexShader,
 	fragmentShader: sunFragmentShader,
 	uniforms: {
-		time: { value: 0 }
+		time: { value: 0 },
+		uPerlin: { value: null },
+		resolution: { value: new THREE.Vector4() }
 	}
 });
-//sun texutre
-const threeTone = new THREE.TextureLoader().load('Assets/sun.jpg');
-threeTone.minFilter = THREE.NearestFilter;
-threeTone.magFilter = THREE.NearestFilter;
 
-//toon shader
-const toonMaterial = new THREE.MeshToonMaterial();
-toonMaterial.map = threeTone;
-toonMaterial.color = new THREE.Color(0xfcba03);
+//sun texutre
+const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
+	256, {
+	format: THREE.RGBFormat,
+	generateMipMaps: true,
+	minFilter: THREE.LinearMipmapFilter,
+	encoding: THREE.sRGBEncoding
+}
+);
+cubeRenderTarget1.texture.type = THREE.HalfFloatType;
+const cubeCamera1 = new THREE.CubeCamera(0.1, 1000, cubeRenderTarget1);
+const perlinMaterial = new THREE.ShaderMaterial({
+	side: THREE.DoubleSide,
+	vertexShader: perlinVertexShader,
+	fragmentShader: perlinFragmentShader,
+	uniforms: {
+		time: { value: 0 },
+	}
+});
+
+function addSunTexture() {
+
+	const geometry = new THREE.SphereBufferGeometry(.99, 30, 30);
+
+	const perlin = new THREE.Mesh(geometry, perlinMaterial);
+	perlin.position.x = sunPos.x;
+	perlin.position.y = sunPos.z;
+	perlin.position.z = sunPos.y;
+	scene.add(perlin);
+}
+addSunTexture();
+
 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.x = sunPos.x;
@@ -245,12 +275,15 @@ controls.update()
 
 
 //Szene rendern lassen
-function animate() {
+function renderScene() {
 	time += 1;
+	cubeCamera1.update(renderer, scene);
+	perlinMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.time.value = time;
+	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget1.texture;
 	scene;
 	controls.update();
-	requestAnimationFrame(animate);
+	requestAnimationFrame(renderScene);
 	renderer.render(scene, camera);
 };
 
@@ -276,4 +309,4 @@ function animateCans() {
 
 };
 
-animate();
+renderScene();
