@@ -123,17 +123,19 @@ camera.position.set(3.5, 0.5, 5);
 scene.add(camera);
 
 //load banners for the cans
-var canBanners = [];
-//load the bannernames into an array, so their loading process can be started within one for-loop
-var bannerNames = ["Merkury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
-for (let i = 0; i < (planets.amount); i++) {
-	loadBanners('Assets/Planetbanners/' + bannerNames[i] + '.png');
-}
-function loadBanners(src) {
-	const texture = new THREE.TextureLoader().load(src);
+var canBanners = loadBanners();;
+function loadBanners() {
+	//load the bannernames into an array, so their loading process can be started within one for-loop
+	var bannerNames = ["Merkury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"];
+	
+	var canBanners = [];
+	for (let i = 0; i < (planets.amount); i++) {
+	const texture = new THREE.TextureLoader().load('Assets/Planetbanners/' + bannerNames[i] + '.png');
 	texture.flipY = false;
 	const material = new THREE.MeshPhysicalMaterial({ map: texture });
 	canBanners.push(material);
+	}
+	return canBanners;
 }
 
 //GLTF-Loader for Can
@@ -162,8 +164,8 @@ function loadCans(loader, amountOfCans) {
 		// 	metalness: 1.0,
 		// });
 
-		// var canPositions = getCanPositions(planets.amount);
-		var canPositions = planets.getAllPlanetPositions(0);
+		// set the initial Position of the can once
+		var canPositions = planets.getAllPlanetPositions(time);
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
@@ -186,6 +188,22 @@ function loadCans(loader, amountOfCans) {
 	return cans;
 }
 
+function animateCans() {
+	for (const can of cans) {
+		const offsetTime = time + 500;
+		
+		can.rotation.x = can.rotation.x + .0008;
+		can.rotation.y = can.rotation.y + .0009;
+		can.rotation.z = can.rotation.z + .0003;
+		
+		// this factor is used to decrease the speed of the planets
+		const timeFactor = 1/2000
+		can.position.x = planets.getAllPlanetPositions(time * timeFactor)[canCounter].x;
+		can.position.z = planets.getAllPlanetPositions(time * timeFactor)[canCounter].z;
+	}
+	requestAnimationFrame(animateCans);
+	renderer.render(scene, camera);
+};
 
 
 
@@ -213,10 +231,6 @@ sunMesh.position.x = sunPos.x;
 sunMesh.position.y = sunPos.z;
 sunMesh.position.z = sunPos.y;
 scene.add(sunMesh);
-
-// const origo = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), toonMaterial);
-// origo.position.set(0, 0, 0);
-// scene.add(origo);
 //-------------------------------------------------------------------
 
 //controls (for now)
@@ -237,29 +251,6 @@ function animate() {
 	controls.update();
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
-};
-
-function animateCans() {
-	let canCounter = 0;
-	for (const can of cans) {
-		const offsetTime = time + 500;
-		
-		can.rotation.x = can.rotation.x + .0008;
-		can.rotation.y = can.rotation.y + .0009;
-		can.rotation.z = can.rotation.z + .0003;
-		
-		can.position.x = planets.getAllPlanetPositions(time/2000)[canCounter].x;
-		can.position.z = planets.getAllPlanetPositions(time/2000)[canCounter].z;
-		if (canCounter % 2 === 0) {
-			can.position.y = 0.5 + Math.sin(offsetTime * 0.001) * 0.5;
-		} else {
-			can.position.y = Math.sin(time * 0.001) * 0.3;
-		}
-		canCounter += 1;
-	}
-	requestAnimationFrame(animateCans);
-	renderer.render(scene, camera);
-
 };
 
 animate();
