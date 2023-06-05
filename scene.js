@@ -63,8 +63,8 @@ const canRotations = [
 
 //shaders
 //sun
-const perlinVertexShader = await fetch('./shaders/old/sun_shader.vert').then(response => response.text());
-const perlinFragmentShader = await fetch('./shaders/old/sun_shader.frag').then(response => response.text());
+const perlinVertexShader = await fetch('./shaders/perlin/perlin_shader.vert').then(response => response.text());
+const perlinFragmentShader = await fetch('./shaders/perlin/perlin_shader.frag').then(response => response.text());
 const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
 const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
 
@@ -78,7 +78,7 @@ const renderer = new THREE.WebGLRenderer(
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-// renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.xr.enabled = true;
 
 //AR-Button
@@ -130,7 +130,7 @@ function loadBanners() {
 	for (let i = 0; i < (planets.amount); i++) {
 		const texture = new THREE.TextureLoader().load('Assets/Planetbanners/' + bannerNames[i] + '.png');
 		texture.flipY = false;
-		// texture.encoding = THREE.sRGBEncoding;
+		texture.encoding = THREE.sRGBEncoding;
 		const material = new THREE.MeshPhysicalMaterial({ map: texture });
 		canBanners.push(material);
 	}
@@ -221,12 +221,11 @@ const sunMaterial = new THREE.ShaderMaterial({
 //sun texutre
 const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
 	256, {
-	format: THREE.RGBFormat,
+	format: THREE.RGBAFormat,
 	generateMipMaps: true,
 	minFilter: THREE.LinearMipmapFilter,
-	// encoding: THREE.sRGBEncoding
-}
-);
+	encoding: THREE.sRGBEncoding
+});
 cubeRenderTarget1.texture.type = THREE.HalfFloatType;
 const cubeCamera1 = new THREE.CubeCamera(0.1, 1000, cubeRenderTarget1);
 const perlinMaterial = new THREE.ShaderMaterial({
@@ -271,7 +270,7 @@ controls.update()
 //Szene rendern lassen
 function renderScene() {
 	time += 1;
-	// cubeCamera1.update(renderer, scene);
+	cubeCamera1.update(renderer, scene);
 	perlinMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget1.texture;
