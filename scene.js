@@ -189,6 +189,8 @@ function loadCans(loader, amountOfCans) {
 }
 
 function animateCans() {
+	// the counter is used to differentiate between the planets
+	let canCounter = 0;
 	for (const can of cans) {
 		const offsetTime = time + 500;
 		
@@ -196,10 +198,10 @@ function animateCans() {
 		can.rotation.y = can.rotation.y + .0009;
 		can.rotation.z = can.rotation.z + .0003;
 		
-		// this factor is used to decrease the speed of the planets
 		const timeFactor = 1/2000
 		can.position.x = planets.getAllPlanetPositions(time * timeFactor)[canCounter].x;
 		can.position.z = planets.getAllPlanetPositions(time * timeFactor)[canCounter].z;
+		canCounter += 1;
 	}
 	requestAnimationFrame(animateCans);
 	renderer.render(scene, camera);
