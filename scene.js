@@ -191,9 +191,7 @@ function loadCans(loader, amountOfCans) {
 function animateCans() {
 	// the counter is used to differentiate between the planets
 	let canCounter = 0;
-	for (const can of cans) {
-		const offsetTime = time + 500;
-		
+	for (const can of cans) {		
 		can.rotation.x = can.rotation.x + .0008;
 		can.rotation.y = can.rotation.y + .0009;
 		can.rotation.z = can.rotation.z + .0003;
