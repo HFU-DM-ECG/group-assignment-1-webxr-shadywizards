@@ -17,9 +17,11 @@ const sizes = {
 	height: window.innerHeight
 }
 
+const solarSystemOffset = -5;
+
 const sunPos = {
 	x: 0,
-	y: 0,
+	y: solarSystemOffset,
 	z: 0
 }
 
@@ -144,6 +146,8 @@ var cans = loadCans(loader, planets.amount);
 
 // loads the cans using the supplied loader and returns them in a list
 function loadCans(loader, amountOfCans) {
+	var canGroup = new THREE.Group();
+	canGroup.position.set(0, 0, solarSystemOffset);
 	var cans = [];
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
@@ -161,9 +165,10 @@ function loadCans(loader, amountOfCans) {
 			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
 			//add banner to can
 			thisCan.getObjectByName("Cylinder.002_0").material = canBanners[i];
-			scene.add(thisCan);
+			canGroup.add(thisCan);
 			cans.push(thisCan);
 		}
+		scene.add(canGroup);
 		animateCans(cans);
 	}, function (xhr) {
 		console.log((xhr.loaded / xhr.total * 100) + "% loaded")
