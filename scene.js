@@ -8,7 +8,7 @@ import * as planets from './planets.js';
 //changing variables
 let time = 0;
 
-//constant Variables
+//constant Variables ----------------------------------------------------------------
 const startContainer = document.getElementById('start-container');
 const sceneContainer = document.getElementById('scene-container');
 
@@ -60,16 +60,16 @@ const canRotations = [
 	can4,
 	can5,
 ]
+//-----------------------------------------------------------------------------------
 
-//shaders
-//sun
+//load shaders
 const perlinVertexShader = await fetch('./shaders/perlin/perlin_shader.vert').then(response => response.text());
 const perlinFragmentShader = await fetch('./shaders/perlin/perlin_shader.frag').then(response => response.text());
 const sunVertexShader = await fetch('./shaders/sun_shader.vert').then(response => response.text());
 const sunFragmentShader = await fetch('./shaders/sun_shader.frag').then(response => response.text());
 
 
-//Basiskomponenten erzeugen
+//create base components
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
 const renderer = new THREE.WebGLRenderer(
@@ -91,21 +91,22 @@ arButton.id = "ar-btn";
 startContainer.appendChild(arButton);
 
 
-//AR controller 
+//AR controller (for touch input on mobile devices) --------------------------------
 let scenePlaced = false;
 function onSelect() {
 	if (scenePlaced) return;
 
+	//remove className "hidden", which has the attribute display: none -> show sceneContainer
 	sceneContainer.className = "";
 	console.log('solar system placed');
 
 	scenePlaced = true;
 }
 
-//controller = first touch input onto the scene
-const controller = renderer.xr.getController(0);
+const controller = renderer.xr.getController(0); //renderer.xr.getController(0) = first touch input onto the scene
 controller.addEventListener("select", onSelect);
 scene.add(controller);
+//----------------------------------------------------------------------------------
 
 
 //Lights
@@ -116,7 +117,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, .2);
 ambientLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(ambientLight);
 
-//Kamera-Settings
+//Camera settings
 camera.position.set(3.5, 0.5, 5);
 scene.add(camera);
 
@@ -147,20 +148,6 @@ function loadCans(loader, amountOfCans) {
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
 		can.scale.set(0.004, 0.004, 0.004);
-
-		// //metallic effect on can
-		// const generator = new THREE.PMREMGenerator(renderer);
-		// const envMap = generator.fromScene(scene, 0, 0.1, 100);
-		// envMap.mapping = THREE.CubeRefractionMapping;;
-		// envMap.texture.encoding = THREE.sRGBEEncoding;
-		// can.material = new THREE.MeshPhysicalMaterial({
-		// 	envMap: envMap.texture,
-		// 	envMapIntensity: 1.0,
-		// 	roughness: 0.1,
-		// 	clearcoat: 1.0,
-		// 	clearcoatRoughness: 0.0,
-		// 	metalness: 1.0,
-		// });
 
 		// set the initial Position of the can once
 		var canPositions = planets.getAllPlanetPositions(time);
@@ -218,17 +205,21 @@ const sunMaterial = new THREE.ShaderMaterial({
 	}
 });
 
-//sun texutre
-//use the noise of perlinShader as a texture, in order to improve performance
-const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
+//improved sun texutre -> use the layered noise of perlinShader as a texture, in order to improve performance and have a more realistic look-------------------
+//create new scene, which only contains a sphere with a simplex perlin noise shader 
+const scenePerlin = new THREE.Scene();
+// cuberenderTarget contains the perlin texture
+const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(
 	256, {
 	format: THREE.RGBAFormat,
 	generateMipMaps: true,
 	minFilter: THREE.LinearMipmapFilter,
 	encoding: THREE.sRGBEncoding
 });
-cubeRenderTarget1.texture.type = THREE.HalfFloatType;
-const cubeCamera1 = new THREE.CubeCamera(0.1, 10, cubeRenderTarget1);
+cubeRenderTarget.texture.type = THREE.HalfFloatType;
+// THREE.CubeCamera: Constructs a CubeCamera that contains 6 PerspectiveCameras that render to a WebGLCubeRenderTarget.
+const cubeCamera = new THREE.CubeCamera(0.1, 10, cubeRenderTarget);
+// The ShaderMaterial which is used as a texture
 const perlinMaterial = new THREE.ShaderMaterial({
 	side: THREE.DoubleSide,
 	vertexShader: perlinVertexShader,
@@ -239,16 +230,16 @@ const perlinMaterial = new THREE.ShaderMaterial({
 });
 
 function addSunTexture() {
-
 	const geometry = new THREE.SphereBufferGeometry(.99, 30, 30);
 
 	const perlin = new THREE.Mesh(geometry, perlinMaterial);
 	perlin.position.x = sunPos.x;
 	perlin.position.y = sunPos.z;
 	perlin.position.z = sunPos.y;
-	scene.add(perlin);
+	scenePerlin.add(perlin);
 }
 addSunTexture();
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
@@ -258,7 +249,7 @@ sunMesh.position.z = sunPos.y;
 scene.add(sunMesh);
 //-------------------------------------------------------------------
 
-//controls (for now)
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.autoRotate = false;
 controls.enablePan = false;
@@ -268,13 +259,12 @@ controls.maxPolarAngle = Math.PI;
 controls.update()
 
 
-//Szene rendern lassen
 function renderScene() {
 	time += 1;
-	cubeCamera1.update(renderer, scene);
+	cubeCamera.update(renderer, scenePerlin);
 	perlinMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.time.value = time;
-	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget1.texture;
+	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture; // cubeRenderTarget.texture = perlinMaterial
 	scene;
 	controls.update();
 	requestAnimationFrame(renderScene);

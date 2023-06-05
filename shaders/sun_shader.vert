@@ -16,6 +16,8 @@ mat2 rotate(float a) {
 
 
 void main() {
+    // create 3 layers, which all move differently --------------------------------
+    // in the fragment shader they are used to create 3 different layers of noise
     float t = time * 0.0002;
     mat2 rot = rotate(t);
     mat2 rot1 = rotate(t + 10.);
@@ -32,6 +34,7 @@ void main() {
     vec3 p2 = position.xyz;
     p2.xy = rot2*p2.xy; //rotate around the z axis
     vLayer2 = p2;
+    //-----------------------------------------------------------------------------
 
     vUv = uv;
 

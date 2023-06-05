@@ -11,7 +11,6 @@ uniform sampler2D texture1;
 uniform vec4 resolution;
 uniform samplerCube uPerlin;
 
-float PI = 3.14159265358979328;
 
 // calculates brightness values according to angle between normal of the vertex and the vector of the "eye" -> camera
 // values are brighter the bigger the angle
@@ -28,10 +27,10 @@ vec3 brightnessToColor(float b) {
     return (vec3(b, b*b, b*b*b*b) / 0.25) * 0.8;
 }
 
-float supersun() {
+float layeredNoiseTexture() {
     highp float sum = 0.;
     //textureCube returns a texel, i.e. the color value of the texture at the given coordinates
-    sum += textureCube(uPerlin, vLayer0).r;
+    sum += textureCube(uPerlin, vLayer0).r; //each layer contains the perlin texture from the perlin_shader
     sum += textureCube(uPerlin, vLayer1).r;
     sum += textureCube(uPerlin, vLayer2).r;
     //overlapping textures would be too bright without lowering brightness
@@ -41,7 +40,7 @@ float supersun() {
 
 
 void main() {
-    float brightness = supersun();
+    float brightness = layeredNoiseTexture();
     brightness = brightness*1.5 + 1.;
 
     float fres = Fresnel(eyeVector, vNormal);

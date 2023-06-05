@@ -7,6 +7,18 @@ uniform float time;
 //	Simplex 4D Noise 
 //	by Ian McEwan, Ashima Arts
 //
+//The advantages of simplex noise over Perlin noise (https://en.wikipedia.org/wiki/Simplex_noise):
+    // Simplex noise has lower computational complexity and requires fewer multiplications.
+    // Simplex noise scales to higher dimensions (4D, 5D) with much less computational cost: the complexity is O ( n 2 ) O(n^{2}) for n n dimensions instead of the O ( n 2 n ) {\displaystyle O(n\,2^{n})} of classic noise.[2]
+    // Simplex noise has no noticeable directional artifacts (is visually isotropic), though noise generated for different dimensions is visually distinct (e.g. 2D noise has a different look than 2D slices of 3D noise, and it looks increasingly worse for higher dimensions[3]).
+    // Simplex noise has a well-defined and continuous gradient (almost) everywhere that can be computed quite cheaply.
+    // Simplex noise is easy to implement in hardware
+    // Noise computations are based on a network of triangles instead of squares, which leads to a lower number of vertices involved in the computation
+//
+// Advantage for our project (besides performance):
+    // less flickering from the noise output
+    // after computing noise values to color, it appears much brighter then with classic perlin noise
+//
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 float permute(float x){return floor(mod(((x*34.0)+1.0)*x, 289.0));}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -108,12 +120,13 @@ float Fresnel(vec3 eyevector, vec3 worldNormal) {
     return pow(1.0 + dot(eyevector, worldNormal), 3.0);
 }
 
-float fbm(vec4 p) {
+// layer the simplex noise n times
+float fbm(vec4 p, int layers) {
     float sum = 0.;
     float amp = 1.;
     float scale = 1.;
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < layers; i++) {
         sum += snoise(p*scale)*amp;
         p.w += 100.; //offset each layer of noise in time
         amp *= 0.9; //lower ampitude for each layer => less bright
@@ -124,11 +137,13 @@ float fbm(vec4 p) {
 }
 
 void main() {
-    float noisy = fbm(vec4(vPosition*4., time*0.0005));
+    vec4 p = vec4(vPosition*4., time*0.0005);
+    float noisy = fbm(p, 5);
 
     vec4 p1 = vec4(vPosition*2., time*0.001);
-    float spots = max(snoise(p1), 0.);
+    float spots = max(snoise(p1), 0.); // returns big noise spots
 
     gl_FragColor = vec4(noisy);
-    gl_FragColor *= mix(1., spots, 0.7);
+    // fragColor multiplied by the mix between 1 and the spots values = lower contrast and less smaller, individual fields and more of a connection between the noise spots
+    gl_FragColor *= mix(1., spots, 0.7); 
 }
