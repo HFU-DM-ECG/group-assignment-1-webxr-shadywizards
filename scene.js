@@ -78,7 +78,7 @@ const renderer = new THREE.WebGLRenderer(
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputEncoding = THREE.sRGBEncoding;
+// renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.xr.enabled = true;
 
 //AR-Button
@@ -130,7 +130,7 @@ function loadBanners() {
 	for (let i = 0; i < (planets.amount); i++) {
 		const texture = new THREE.TextureLoader().load('Assets/Planetbanners/' + bannerNames[i] + '.png');
 		texture.flipY = false;
-		texture.encoding = THREE.sRGBEncoding;
+		// texture.encoding = THREE.sRGBEncoding;
 		const material = new THREE.MeshPhysicalMaterial({ map: texture });
 		canBanners.push(material);
 	}
@@ -224,7 +224,7 @@ const cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget(
 	format: THREE.RGBFormat,
 	generateMipMaps: true,
 	minFilter: THREE.LinearMipmapFilter,
-	encoding: THREE.sRGBEncoding
+	// encoding: THREE.sRGBEncoding
 }
 );
 cubeRenderTarget1.texture.type = THREE.HalfFloatType;
