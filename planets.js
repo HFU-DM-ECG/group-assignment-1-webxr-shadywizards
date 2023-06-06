@@ -3,15 +3,15 @@ const M = 1.989 * 10 ^ 30; // mass of the sun in kilograms
 const G = 9.81; // Gravitationskonstante in N / kg
 // dictionary for necessary planet data
 const Planets = {
-  "Mercury": { semiMajorAxis: 0.3871, orbitalPeriodInYears: 0.2408 },
-  "Venus": { semiMajorAxis: 0.7233, orbitalPeriodInYears: 0.6152 },
-  "Earth": { semiMajorAxis: 1, orbitalPeriodInYears: 1 },
-  "Mars": { semiMajorAxis: 1.5273, orbitalPeriodInYears: 1.8809 },
-  "Jupiter": { semiMajorAxis: 5.2028, orbitalPeriodInYears: 11.862 },
-  "Saturn": { semiMajorAxis: 9.5388, orbitalPeriodInYears: 29.458 },
-  "Uranus": { semiMajorAxis: 19.1914, orbitalPeriodInYears: 84.01 },
-  "Neptune": { semiMajorAxis: 30.0611, orbitalPeriodInYears: 164.79 },
-  "Pluto": { semiMajorAxis: 39.5294, orbitalPeriodInYears: 248.54 },
+  "Mercury": { semiMajorAxis: 0.3871, orbitalPeriodInYears: 0.2408, radiusInKM: 2439.7 },
+  "Venus": { semiMajorAxis: 0.7233, orbitalPeriodInYears: 0.6152, radiusInKM: 6051.8 },
+  "Earth": { semiMajorAxis: 1, orbitalPeriodInYears: 1, radiusInKM: 6371 },
+  "Mars": { semiMajorAxis: 1.5273, orbitalPeriodInYears: 1.8809, radiusInKM: 3389.5 },
+  "Jupiter": { semiMajorAxis: 5.2028, orbitalPeriodInYears: 11.862, radiusInKM: 69911 },
+  "Saturn": { semiMajorAxis: 9.5388, orbitalPeriodInYears: 29.458, radiusInKM: 58232 },
+  "Uranus": { semiMajorAxis: 19.1914, orbitalPeriodInYears: 84.01, radiusInKM: 25362 },
+  "Neptune": { semiMajorAxis: 30.0611, orbitalPeriodInYears: 164.79, radiusInKM: 24622 },
+  "Pluto": { semiMajorAxis: 39.5294, orbitalPeriodInYears: 248.54, radiusInKM: 1188.3 },
 };
 // sMA definiert die Größe der Umlaufbahn
 // große Halbachsen jedes Planetens sind in AU gegeben. 
@@ -38,14 +38,12 @@ export function getAllPlanetPositions(time) {
     var position = calculatePlanetPosition(time, Planets[key]);
     coordinates.push({ x: position.x, y: 0, z: position.y });
   }
-  // console.log(coordinates[0].x);
+
   return coordinates;
 }
 
 // helper function to determine the neccessary scale of the whole solar system to fit a certain area in the scene
 // e.g. 2 meters in the scene -> 0.01011905063066983
-console.log(getScaleForSolarSystem(2));
-// getDistanceBetweenVectors((0, 0), (1, 0));
 export function getScaleForSolarSystem(goalDistInMeters) {
   // how far is it from the furthest can (pluto) to the sun in the solarsystem group?
   // ignoring the radius!
@@ -64,4 +62,28 @@ function getDistanceBetweenVectors(a, b){
   let x = b.z - a.z;
 
   return Math.sqrt(x * x + z * z);
+}
+
+// function to get the can scale relative to the sun, the sun being 2 meters wide
+function getCanScaleRelativeToSun(planet) {
+ const sunWidth = 2;
+ const rSunWidth = 20000;
+ const scaleFactor = sunWidth / rSunWidth;
+
+ const rPlanetWidth = planet.radiusInKM;
+ const planetWidth = rPlanetWidth * scaleFactor;
+
+ // the can has a scale of 1 already so the new width can be used as scale. 
+ return planetWidth;
+}
+
+// get all the scales of all the cans for can generation
+export function getAllCanScales() {
+  const scales = [];
+
+  for (const key in Planets) {
+    var scale = getCanScaleRelativeToSun(Planets[key]);
+    scales.push(scale);
+  }
+  return scales;
 }

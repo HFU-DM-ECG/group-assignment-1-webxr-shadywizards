@@ -7,7 +7,7 @@ import * as planets from './planets.js';
 
 //changing variables
 let time = 0;
-let solarSystemOffset = 0;
+let solarSystemOffset = -3;
 
 //constant Variables ----------------------------------------------------------------
 const startContainer = document.getElementById('start-container');
@@ -84,7 +84,7 @@ renderer.xr.enabled = true;
 
 // parent of all objects
 var solarSystem = new THREE.Group();
-solarSystem.position.set(0, 0, solarSystemOffset);
+solarSystem.position.set(0, 1, solarSystemOffset);
 const solarSystemWidth = 100;
 const solarSystemScale = planets.getScaleForSolarSystem(solarSystemWidth);
 solarSystem.scale.set(solarSystemScale, solarSystemScale, solarSystemScale);
@@ -155,29 +155,26 @@ function loadCans(loader, amountOfCans) {
 	var cans = [];
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
-		// const canStandardScale = 0.004 * 53; // equals 1 
-		// can.scale.set(canStandardScale, canStandardScale, canStandardScale);
+
 		const canObject = can.getObjectByName("Can");
 		const canDimensionFactorToOneMeter =  1/3.65;
 		canObject.scale.set(canDimensionFactorToOneMeter, canDimensionFactorToOneMeter, canDimensionFactorToOneMeter);
 		
-		// console.log("global trans: " + canObject.scale.x);
-		// can model height = 
-		// should set the sun to the same height and scale it according to the kms too
-		// can.scale.set(1, 100000000000000000000, 100000000000000000000);
-	
+		
 		// set the initial Position of the can once
 		var canPositions = planets.getAllPlanetPositions(time);
-		var canRadiiInKm = planets.getAllPlanetRadii();
+		var canScales = planets.getAllCanScales();
+
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
+			
 			if (i != 0) {
 				thisCan = can.clone();
 			}
 			thisCan.position.set(canPositions[i].x, canPositions[i].y, canPositions[i].z);
 			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
-			// thisCan.setSize(canRadiiInKm[3]);
+			thisCan.scale.set(canScales[i], canScales[i], canScales[i]);
 			//add banner to can
 			thisCan.getObjectByName("Cylinder.002_0").material = canBanners[i];
 			solarSystem.add(thisCan);
@@ -249,7 +246,7 @@ const perlinMaterial = new THREE.ShaderMaterial({
 });
 
 function addSunTexture() {
-	const geometry = new THREE.SphereBufferGeometry(.99, 30, 30);
+	const geometry = new THREE.SphereBufferGeometry(0.99, 30, 30);
 
 	const perlin = new THREE.Mesh(geometry, perlinMaterial);
 	perlin.position.x = sunPos.x;
@@ -265,6 +262,9 @@ const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.x = sunPos.x;
 sunMesh.position.y = sunPos.y;
 sunMesh.position.z = sunPos.z;
+// scaling messes with the shader
+// const sunRadius = 696.340;
+// sunMesh.scale(sunRadius, sunRadius, sunRadius);
 solarSystem.add(sunMesh);
 //-------------------------------------------------------------------
 
