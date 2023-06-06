@@ -7,6 +7,7 @@ import * as planets from './planets.js';
 
 //changing variables
 let time = 0;
+let solarSystemOffset = 0;
 
 //constant Variables ----------------------------------------------------------------
 const startContainer = document.getElementById('start-container');
@@ -16,8 +17,6 @@ const sizes = {
 	width: window.innerWidth,
 	height: window.innerHeight
 }
-
-const solarSystemOffset = -5;
 
 const sunPos = {
 	x: 0,
@@ -98,8 +97,7 @@ let scenePlaced = false;
 function onSelect() {
 	if (scenePlaced) return;
 
-	//remove className "hidden", which has the attribute display: none -> show sceneContainer
-	sceneContainer.className = "";
+	solarSystemOffset = -5;
 	console.log('solar system placed');
 
 	scenePlaced = true;
