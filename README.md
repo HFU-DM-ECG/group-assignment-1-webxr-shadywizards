@@ -20,7 +20,9 @@ The rating will be as follows:
 
 Since the last group assignment we have initially worked on improving on the Scene trying to make use of the feedback. We have made sure to clone the cans and put a system in place to allow the amount of cans to be scalable. We also removed all HDR-textures as well as remade the Can model in a way to contain a lot less polygons which should result in a better performance in the browser.
 
-We took multiple decisions as a group, including to create multiple banners for the Cans to represent 9 different Planets (including dwarf-planet pluto) in the Scene. We decided on having them spread out and move around the sun in a realistic way. Therefore we used formulas based on kepler's Laws of planetary motions.
+We took multiple decisions as a group, including to create multiple banners for the Cans to represent 9 different Planets (including dwarf-planet pluto) in the Scene. We decided on having them spread out and move around the sun in a realistic way. Therefore we used formulas based on kepler's Laws of planetary motions. We also included the sizing of the different planets.
+
+Hierarchy wise the Solarsystem is now a group with its Children (Sun + 9 planets). The width of the whole solar system can be set with one variable.
 
 The sun shader was improved according to the feedback od the last group assignement. It now uses layered noise textures and a more performant noise function (simplex noise). To make it appear brighter on the edge and close to the edge, a Fresnel function was added to the fragment shader.
 
