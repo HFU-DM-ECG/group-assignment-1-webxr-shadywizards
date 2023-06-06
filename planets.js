@@ -42,4 +42,26 @@ export function getAllPlanetPositions(time) {
   return coordinates;
 }
 
-// idea: add a slider to change the time speed -> from realistic (basically still) to sped up
+// helper function to determine the neccessary scale of the whole solar system to fit a certain area in the scene
+// e.g. 2 meters in the scene -> 0.01011905063066983
+console.log(getScaleForSolarSystem(2));
+// getDistanceBetweenVectors((0, 0), (1, 0));
+export function getScaleForSolarSystem(goalDistInMeters) {
+  // how far is it from the furthest can (pluto) to the sun in the solarsystem group?
+  // ignoring the radius!
+  const positionPlutoXY = calculatePlanetPosition(0, Planets.Pluto);
+  const positionPluto = {x: positionPlutoXY.x, y: 0, z: positionPlutoXY.y};
+  const positionSun = {x: 0, y: 0, z: 0};
+  const currentDist = getDistanceBetweenVectors(positionPluto, positionSun);
+
+  //return the scale
+  return goalDistInMeters / currentDist;
+}
+
+//takes two vector2's, returns a number
+function getDistanceBetweenVectors(a, b){
+  let z = b.x - a.x;
+  let x = b.z - a.z;
+
+  return Math.sqrt(x * x + z * z);
+}

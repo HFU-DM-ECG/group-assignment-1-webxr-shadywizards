@@ -85,6 +85,9 @@ renderer.xr.enabled = true;
 // parent of all objects
 var solarSystem = new THREE.Group();
 solarSystem.position.set(0, 0, solarSystemOffset);
+const solarSystemWidth = 100;
+const solarSystemScale = planets.getScaleForSolarSystem(solarSystemWidth);
+solarSystem.scale.set(solarSystemScale, solarSystemScale, solarSystemScale);
 scene.add(solarSystem);
 
 //AR-Button
@@ -152,10 +155,20 @@ function loadCans(loader, amountOfCans) {
 	var cans = [];
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
-		can.scale.set(0.004, 0.004, 0.004);
-
+		// const canStandardScale = 0.004 * 53; // equals 1 
+		// can.scale.set(canStandardScale, canStandardScale, canStandardScale);
+		const canObject = can.getObjectByName("Can");
+		const canDimensionFactorToOneMeter =  1/3.65;
+		canObject.scale.set(canDimensionFactorToOneMeter, canDimensionFactorToOneMeter, canDimensionFactorToOneMeter);
+		
+		// console.log("global trans: " + canObject.scale.x);
+		// can model height = 
+		// should set the sun to the same height and scale it according to the kms too
+		// can.scale.set(1, 100000000000000000000, 100000000000000000000);
+	
 		// set the initial Position of the can once
 		var canPositions = planets.getAllPlanetPositions(time);
+		var canRadiiInKm = planets.getAllPlanetRadii();
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
@@ -164,6 +177,7 @@ function loadCans(loader, amountOfCans) {
 			}
 			thisCan.position.set(canPositions[i].x, canPositions[i].y, canPositions[i].z);
 			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
+			// thisCan.setSize(canRadiiInKm[3]);
 			//add banner to can
 			thisCan.getObjectByName("Cylinder.002_0").material = canBanners[i];
 			solarSystem.add(thisCan);
@@ -173,7 +187,7 @@ function loadCans(loader, amountOfCans) {
 	}, function (xhr) {
 		console.log((xhr.loaded / xhr.total * 100) + "% loaded")
 	}, function (error) {
-		console.log("An error occured")
+		console.log("An error occured" + error)
 	});
 	return cans;
 }
