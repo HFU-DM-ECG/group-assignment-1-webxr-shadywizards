@@ -21,7 +21,7 @@ const sizes = {
 const sunPos = {
 	x: 0,
 	y: 0,
-	z: solarSystemOffset
+	z: 0
 }
 
 const can1 = {
@@ -81,6 +81,11 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.xr.enabled = true;
+
+// parent of all objects
+var solarSystem = new THREE.Group();
+solarSystem.position.set(0, 0, solarSystemOffset);
+scene.add(solarSystem);
 
 //AR-Button
 const arButton = ARButton.createButton(renderer, {
@@ -144,8 +149,6 @@ var cans = loadCans(loader, planets.amount);
 
 // loads the cans using the supplied loader and returns them in a list
 function loadCans(loader, amountOfCans) {
-	var canGroup = new THREE.Group();
-	canGroup.position.set(0, 0, solarSystemOffset);
 	var cans = [];
 	loader.load('Assets/Can_Self_Material.glb', function (glb) {
 		const can = glb.scene;
@@ -163,10 +166,9 @@ function loadCans(loader, amountOfCans) {
 			thisCan.rotation.set(canRotations[i % 5].rx, canRotations[i % 5].ry, canRotations[i % 5].rz);
 			//add banner to can
 			thisCan.getObjectByName("Cylinder.002_0").material = canBanners[i];
-			canGroup.add(thisCan);
+			solarSystem.add(thisCan);
 			cans.push(thisCan);
 		}
-		scene.add(canGroup);
 		animateCans(cans);
 	}, function (xhr) {
 		console.log((xhr.loaded / xhr.total * 100) + "% loaded")
@@ -239,7 +241,7 @@ function addSunTexture() {
 	perlin.position.x = sunPos.x;
 	perlin.position.y = sunPos.y;
 	perlin.position.z = sunPos.z;
-	scenePerlin.add(perlin);
+	solarSystem.add(perlin);
 }
 addSunTexture();
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -249,7 +251,7 @@ const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.x = sunPos.x;
 sunMesh.position.y = sunPos.y;
 sunMesh.position.z = sunPos.z;
-scene.add(sunMesh);
+solarSystem.add(sunMesh);
 //-------------------------------------------------------------------
 
 
@@ -264,7 +266,7 @@ controls.update()
 
 function renderScene() {
 	time += 1;
-	cubeCamera.update(renderer, scenePerlin);
+	cubeCamera.update(renderer, scene);
 	perlinMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture; // cubeRenderTarget.texture = perlinMaterial
