@@ -21,8 +21,8 @@ const solarSystemOffset = -5;
 
 const sunPos = {
 	x: 0,
-	y: solarSystemOffset,
-	z: 0
+	y: 0,
+	z: solarSystemOffset
 }
 
 const can1 = {
@@ -239,8 +239,8 @@ function addSunTexture() {
 
 	const perlin = new THREE.Mesh(geometry, perlinMaterial);
 	perlin.position.x = sunPos.x;
-	perlin.position.y = sunPos.z;
-	perlin.position.z = sunPos.y;
+	perlin.position.y = sunPos.y;
+	perlin.position.z = sunPos.z;
 	scenePerlin.add(perlin);
 }
 addSunTexture();
@@ -249,8 +249,8 @@ addSunTexture();
 
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.x = sunPos.x;
-sunMesh.position.y = sunPos.z;
-sunMesh.position.z = sunPos.y;
+sunMesh.position.y = sunPos.y;
+sunMesh.position.z = sunPos.z;
 scene.add(sunMesh);
 //-------------------------------------------------------------------
 
