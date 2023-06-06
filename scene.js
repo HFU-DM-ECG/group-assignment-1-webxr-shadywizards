@@ -84,7 +84,7 @@ renderer.xr.enabled = true;
 
 // parent of all objects
 var solarSystem = new THREE.Group();
-solarSystem.position.set(0, 1, solarSystemOffset);
+solarSystem.position.set(0, 0, solarSystemOffset);
 const solarSystemWidth = 100;
 const solarSystemScale = planets.getScaleForSolarSystem(solarSystemWidth);
 solarSystem.scale.set(solarSystemScale, solarSystemScale, solarSystemScale);
