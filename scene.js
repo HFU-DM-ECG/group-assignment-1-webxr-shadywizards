@@ -281,7 +281,7 @@ controls.update()
 
 function renderScene() {
 	time += 1;
-	cubeCamera.update(renderer, scene);
+	// cubeCamera.update(renderer, scene);
 	perlinMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.time.value = time;
 	sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture; // cubeRenderTarget.texture = perlinMaterial
