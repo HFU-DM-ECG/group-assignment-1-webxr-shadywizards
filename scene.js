@@ -82,7 +82,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.shadowMap.enabled = true;
 renderer.xr.enabled = true;
-sceneContainer.appendChild(renderer.domElement);
+document.body.appendChild(renderer.domElement);
 
 // parent of all objects
 var solarSystem = new THREE.Group();
