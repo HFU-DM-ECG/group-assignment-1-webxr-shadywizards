@@ -7,7 +7,7 @@ import * as planets from './planets.js';
 
 //changing variables
 let time = 0;
-let solarSystemOffset = -3;
+let solarSystemOffset = 0;
 
 //constant Variables ----------------------------------------------------------------
 const startContainer = document.getElementById('start-container');
@@ -80,7 +80,9 @@ const renderer = new THREE.WebGLRenderer(
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.shadowMap.enabled = true;
 renderer.xr.enabled = true;
+sceneContainer.appendChild(renderer.domElement);
 
 // parent of all objects
 var solarSystem = new THREE.Group();
@@ -122,7 +124,6 @@ const sunLight = new THREE.PointLight(0xffffff, 1.5);
 sunLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(sunLight);
 const ambientLight = new THREE.AmbientLight(0xffffff, .2);
-ambientLight.position.set(sunPos.x, sunPos.y, sunPos.z);
 scene.add(ambientLight);
 
 //Camera settings
@@ -157,10 +158,10 @@ function loadCans(loader, amountOfCans) {
 		const can = glb.scene;
 
 		const canObject = can.getObjectByName("Can");
-		const canDimensionFactorToOneMeter =  1/3.65;
+		const canDimensionFactorToOneMeter = 1 / 3.65;
 		canObject.scale.set(canDimensionFactorToOneMeter, canDimensionFactorToOneMeter, canDimensionFactorToOneMeter);
-		
-		
+
+
 		// set the initial Position of the can once
 		var canPositions = planets.getAllPlanetPositions(time);
 		var canScales = planets.getAllCanScales();
@@ -168,7 +169,7 @@ function loadCans(loader, amountOfCans) {
 		// clone the cans and put them into the array to be returned later
 		for (var i = 0; i < amountOfCans; i++) {
 			var thisCan = can;
-			
+
 			if (i != 0) {
 				thisCan = can.clone();
 			}
